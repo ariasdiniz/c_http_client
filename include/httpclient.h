@@ -1,0 +1,3 @@
+#ifndef _ARIA_HTTP_CLIENT_H
+#define _ARIA_HTTP_CLIENT_H
+#endif // _ARIA_HTTP_CLIENT_H
