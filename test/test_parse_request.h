@@ -1,0 +1,58 @@
+#include "../include/httpclient.h"
+#include "../lib/aria_data_structures/datastructures.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+void test_iterate_over_null_hash() {
+  HTTPRequest *request = (HTTPRequest *)malloc(sizeof(HTTPRequest));
+  request->body = "body";
+  request->headers = NULL;
+  request->method = "GET";
+  request->path = "/test";
+  char *result = parse_request(request);
+  char *expected_result = "GET /test HTTP/1.1\n\nbody\n";
+  assert(strcmp(result, expected_result) == 0);
+  free(result);
+  printf("test_iterate_over_null_hash passed.\n");
+}
+
+void test_iterate_over_hash_empty() {
+  HashTable *headers = createhash();
+  HTTPRequest *request = (HTTPRequest *)malloc(sizeof(HTTPRequest));
+  request->body = "body";
+  request->headers = headers;
+  request->method = "GET";
+  request->path = "/test";
+  char *result = parse_request(request);
+  char *expected_result = "GET /test HTTP/1.1\n\nbody\n";
+  assert(strcmp(result, expected_result) == 0);
+  free(result);
+  printf("test_iterate_over_empty_hash passed.\n");
+}
+
+void test_iterate_over_hash() {
+  HashTable *headers = createhash();
+  HTTPRequest *request = (HTTPRequest *)malloc(sizeof(HTTPRequest));
+  addtohash(headers, "key1", "value1");
+  addtohash(headers, "key1", "value");
+  addtohash(headers, "key2", "value2");
+  request->body = "body";
+  request->headers = headers;
+  request->method = "GET";
+  request->path = "/test";
+  char *result = parse_request(request);
+  char *expected_result = "GET /test HTTP/1.1\nkey1: value1\nkey1: value\nkey2: value2\n\nbody\n";
+  assert(strcmp(result, expected_result) == 0);
+  free(result);
+  printf("test_iterate_over_hash passed.\n");
+}
+
+void run_parse_requests_test() {
+  printf("----------STARTING PARSE REQUEST TEST-----------\n");
+  test_iterate_over_null_hash();
+  test_iterate_over_hash_empty();
+  test_iterate_over_hash();
+  printf("----------FINISHING PARSE REQUEST TEST----------\n");
+}
