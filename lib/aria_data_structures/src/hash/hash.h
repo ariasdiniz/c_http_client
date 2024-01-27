@@ -8,6 +8,11 @@ typedef struct HashTable {
   LinkedList *bucket[ARIA_DATA_STRUCTURES_HASH_MAX_SIZE];
 } HashTable;
 
+typedef struct KeyValue {
+  char *key;
+  char *value;
+} KeyValue;
+
 HashTable *createhash();
 void *deletehash(HashTable *hash);
 char *getfromhash(HashTable *hash, char *key);

@@ -2,3 +2,5 @@ Makefile
 CMake*
 cmake*
 main
+main.c
+/.vscode

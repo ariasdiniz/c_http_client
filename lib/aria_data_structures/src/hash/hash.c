@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct KeyValue {
-  char *key;
-  char *value;
-} KeyValue;
-
 /*
   Create a new HashTable and return a pointer to it.
   Don't forget to free it's memory calling deletehash on it
