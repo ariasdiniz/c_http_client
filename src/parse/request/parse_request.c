@@ -35,9 +35,8 @@ static char *mount_http(HTTPRequest *request) {
   return request_text;
 }
 
-HTTPResponse *send(HTTPRequest *request, char *host, int port) {
-  HTTPResponse *response = malloc(sizeof(HTTPResponse));
-  printf("%s", mount_http(request));
+char *parse_request(HTTPRequest *request, char *host, int port) {
+  char *response = mount_http(request);
   free(request->headers);
   free(request);
   return response;

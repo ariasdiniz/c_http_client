@@ -17,6 +17,6 @@ typedef struct HTTPResponse {
   char *body;
 } HTTPResponse;
 
-HTTPResponse *send(HTTPRequest *request, char *host, int port);
+char *parse_request(HTTPRequest *request, char *host, int port);
 
 #endif
