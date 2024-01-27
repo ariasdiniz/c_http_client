@@ -29,6 +29,9 @@ static char *mount_http(HTTPRequest *request) {
   snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\n", request->method, request->path);
   strcat(request_text, buffer);
   iterate_over_hash(request->headers, request_text, buffer);
+  strcat(request_text, "\n");
+  strcat(request_text, request->body);
+  strcat(request_text, "\n");
   return request_text;
 }
 
