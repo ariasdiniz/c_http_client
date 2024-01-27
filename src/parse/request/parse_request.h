@@ -1,8 +1,8 @@
 #ifndef _ARIA_HTTP_CLIENT_SRC_HTTPCLIENT_H
 #define _ARIA_HTTP_CLIENT_SRC_HTTPCLIENT_H
 
-#include "../lib/aria_data_structures/src/hash/hash.h"
-#include "../lib/aria_data_structures/src/linkedlist/list.h"
+#include "../../../lib/aria_data_structures/src/hash/hash.h"
+#include "../../../lib/aria_data_structures/src/linkedlist/list.h"
 
 typedef struct HTTPRequest {
   char *method;
