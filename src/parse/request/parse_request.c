@@ -25,6 +25,10 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
 
 static char *mount_http(HTTPRequest *request) {
   char *request_text = malloc(_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE);
+  memset(request_text, '\0', _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE);
+  if (request_text == NULL) {
+    return NULL;
+  }
   char buffer[_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE];
   snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\n", request->method, request->path);
   strcat(request_text, buffer);
@@ -35,9 +39,12 @@ static char *mount_http(HTTPRequest *request) {
   return request_text;
 }
 
-char *parse_request(HTTPRequest *request, char *host, int port) {
+char *parse_request(HTTPRequest *request) {
+  if (request == NULL) {
+    return NULL;
+  }
   char *response = mount_http(request);
-  free(request->headers);
+  deletehash(request->headers);
   free(request);
   return response;
 }

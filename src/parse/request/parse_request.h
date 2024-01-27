@@ -11,12 +11,6 @@ typedef struct HTTPRequest {
   char *body;
 } HTTPRequest;
 
-typedef struct HTTPResponse {
-  unsigned int status;
-  HashTable *headers;
-  char *body;
-} HTTPResponse;
-
-char *parse_request(HTTPRequest *request, char *host, int port);
+char *parse_request(HTTPRequest *request);
 
 #endif
