@@ -12,7 +12,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     struct sockaddr_in server_addr;
     char buffer[BUFFER_SIZE];
     int read_size;
-    HTTPResponse *response;
+    HTTPResponse *response = NULL;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
