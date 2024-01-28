@@ -5,12 +5,12 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define BUFFER_SIZE 65536
+#define __BUFFER_SIZE 65536
 
 HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   int sock;
   struct sockaddr_in server_addr;
-  char buffer[BUFFER_SIZE];
+  char buffer[__BUFFER_SIZE];
   int read_size;
   HTTPResponse *response = NULL;
 
@@ -34,11 +34,12 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     return NULL;
   }
 
-  read_size = recv(sock, buffer, BUFFER_SIZE, 0);
+  read_size = recv(sock, buffer, __BUFFER_SIZE - 1, 0);
   if (read_size < 0) {
     close(sock);
     return NULL;
   }
+  buffer[read_size] = '\0';
 
   // printf("%s\n", buffer);
   // TODO: Parse response to HTTPResponse
