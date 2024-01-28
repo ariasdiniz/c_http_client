@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE 99999
+#define _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE 65536
 
 static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
   LinkedList *list;
