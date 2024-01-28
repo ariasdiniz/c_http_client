@@ -24,11 +24,30 @@ static int get_response_code(char *line) {
   }
 }
 
+static KeyValue *get_header(char *line) {
+  char buffer[__RESPONSE_BUFFER_SIZE];
+  KeyValue *kv = malloc(sizeof(KeyValue));
+  if (kv == NULL) {
+    return NULL;
+  }
+  int count = 0;
+  for (int j = 0; line[j] != '\n'; j++) {
+    if (line[j] == ':') {
+      kv->key = buffer;
+      count = 0;
+    }
+    buffer[count] = line[j];
+    count += 1;
+  }
+  return kv;
+}
+
 HTTPResponse *parse_response(char *response) {
   HTTPResponse *http_response = malloc(sizeof(HTTPResponse));
   if (response == NULL) {
     return NULL;
   }
+  http_response->headers = malloc(sizeof(LinkedList));
   char buffer[__RESPONSE_BUFFER_SIZE];
   unsigned int counter = 0;
   int flag = 0;
@@ -45,8 +64,17 @@ HTTPResponse *parse_response(char *response) {
         memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
       }
     case 1:
-      break;
-    case 3:
+      buffer[counter] = response[i];
+      counter += 1;
+      if (response[i] == '\n') {
+        addtolist(http_response->headers, get_header(buffer));
+        counter = 0;
+        memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
+      }
+      if (response[i] == '\n' && response[i + 1] == '\n') {
+        flag |= __BODY_FLAG;
+      }
+    default:
       buffer[counter] = response[i];
       counter += 1;
     }

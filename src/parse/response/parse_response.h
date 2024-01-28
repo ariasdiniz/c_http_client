@@ -5,7 +5,7 @@
 
 typedef struct HTTPResponse {
   char *body;
-  HashTable *headers;
+  LinkedList *headers;
   int status;
 } HTTPResponse;
 
