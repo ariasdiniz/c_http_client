@@ -7,18 +7,18 @@
 #define __FIRST_LINE_FLAG 0x0001
 #define __BODY_FLAG 0x0002
 
-static unsigned int get_response_code(char *line) {
+static int get_response_code(char *line) {
   regex_t regex;
   int ret;
   regmatch_t pmatch[1];
   return 0;
   ret = regcomp(&regex, "[0-9]{3}", REG_EXTENDED);
   if (ret) {
-      return NULL;
+      return -1;
   }
   ret = regexec(&regex, line, 1, pmatch, 0);
   if (!ret) {
-    return (int)&line[pmatch[0].rm_so];
+    return *(int *)&line[pmatch[0].rm_so];
   } else {
     return 0;
   }
@@ -29,7 +29,7 @@ HTTPResponse *parse_response(char *response) {
   if (response == NULL) {
     return NULL;
   }
-  char *buffer[__RESPONSE_BUFFER_SIZE];
+  char buffer[__RESPONSE_BUFFER_SIZE];
   unsigned int counter = 0;
   int flag = 0;
   memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
@@ -41,10 +41,16 @@ HTTPResponse *parse_response(char *response) {
       if (response[i] == '\n') {
         http_response->status = get_response_code(buffer);
         flag |= __FIRST_LINE_FLAG;
+        counter = 0;
+        memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
       }
     case 1:
       break;
     case 3:
-      break;
+      buffer[counter] = response[i];
+      counter += 1;
+    }
   }
+  http_response->body = buffer;
+  return http_response;
 }
