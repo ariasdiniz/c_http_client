@@ -9,6 +9,6 @@ typedef struct HTTPResponse {
   int status;
 } HTTPResponse;
 
-HTTPResponse *parse_response(char *response) {}
+HTTPResponse *parse_response(char *response);
 
 #endif // _ARIA_HTTP_CLIENT_SRC_PARSE_RESPONSE_H

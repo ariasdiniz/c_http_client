@@ -19,7 +19,13 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
     list = hash->bucket[i];
     for (int j = 0; j < hash->bucket[i]->size; j++) {
       kv = ((KeyValue *)getfromindex(list, j));
-      snprintf(buffer, (sizeof(char)*_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE), "%s: %s\n", kv->key, kv->value);
+      snprintf(
+        buffer, 
+        (sizeof(char)*_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE), 
+        "%s: %s\n",
+        kv->key, 
+        kv->value
+      );
       strcat(headers, buffer);
     }
   }
