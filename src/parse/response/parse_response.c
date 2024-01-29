@@ -65,58 +65,6 @@ static KeyValue *get_header(char *line) {
   return kv;
 }
 
-HTTPResponse *parse_response(char *response) {
-  HTTPResponse *http_response = malloc(sizeof(HTTPResponse));
-  if (response == NULL) {
-    return NULL;
-  }
-
-  int buffer_size = strlen(response);
-  http_response->body = malloc(sizeof(char) * buffer_size);
-  if (http_response->body == NULL) {
-    return NULL;
-  }
-
-  http_response->headers = createlist();
-  char buffer[buffer_size];
-  unsigned int counter = 0;
-  int flag = 0;
-  memset(buffer, '\0', buffer_size);
-
-  for (int i = 0; i < buffer_size; i++) {
-    buffer[counter] = response[i];
-    counter++;
-    switch (flag) {
-
-    case 0:
-      if (response[i] == '\r') {
-        http_response->status = get_response_code(buffer);
-        flag |= __FIRST_LINE_FLAG;
-        counter = 0;
-        i++;
-        memset(buffer, '\0', buffer_size);
-        continue;
-      }
-      break;
-
-    case 1:
-      if (response[i] == '\r') {
-        i++;
-        addtolist(http_response->headers, get_header(buffer));
-        counter = 0;
-        memset(buffer, '\0', buffer_size);
-      }
-      if (response[i] == '\r' && response[i + 1] == '\n' && response[i + 2] == '\r' && response[i + 3] == '\n') {
-        counter = 0;
-        flag |= __BODY_FLAG;
-        i += 3;
-      }
-    }
-  }
-  strncpy(http_response->body, buffer, buffer_size);
-  return http_response;
-}
-
 int destroy_response(HTTPResponse *response) {
   if (response == NULL) {
     return -1;
@@ -132,4 +80,66 @@ int destroy_response(HTTPResponse *response) {
   free(response->body);
   free(response);
   return 0;
+}
+
+HTTPResponse *parse_response(char *response) {
+  HTTPResponse *http_response = malloc(sizeof(HTTPResponse));
+  if (response == NULL) {
+    return NULL;
+  }
+
+  int buffer_size = strlen(response);
+  http_response->body = malloc(sizeof(char) * buffer_size);
+  if (http_response->body == NULL) {
+    return NULL;
+  }
+
+  http_response->headers = createlist();
+  char buffer[buffer_size];
+  KeyValue *temp;
+  unsigned int counter = 0;
+  int flag = 0;
+  memset(buffer, '\0', buffer_size);
+
+  for (int i = 0; i < buffer_size; i++) {
+    buffer[counter] = response[i];
+    counter++;
+    switch (flag) {
+
+    case 0:
+      if (response[i] == '\r') {
+        http_response->status = get_response_code(buffer);
+        if (http_response->status == -1) {
+          destroy_response(http_response);
+          return NULL;
+        }
+        flag |= __FIRST_LINE_FLAG;
+        counter = 0;
+        i++;
+        memset(buffer, '\0', buffer_size);
+        continue;
+      }
+      break;
+
+    case 1:
+      if (response[i] == '\r') {
+        i++;
+        temp = get_header(buffer);
+        if (temp == NULL) {
+          destroy_response(http_response);
+          return NULL;
+        }
+        addtolist(http_response->headers, temp);
+        counter = 0;
+        memset(buffer, '\0', buffer_size);
+      }
+      if (response[i] == '\r' && response[i + 1] == '\n' && response[i + 2] == '\r' && response[i + 3] == '\n') {
+        counter = 0;
+        flag |= __BODY_FLAG;
+        i += 3;
+      }
+    }
+  }
+  strncpy(http_response->body, buffer, buffer_size);
+  return http_response;
 }
