@@ -37,16 +37,16 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   server_addr.sin_port = htons(port);
   server_addr.sin_addr.s_addr = inet_addr(host);
 
+  // Parse the HTTP request and store it in buffer
+  parsed_request = parse_request(request);
+  strcpy(buffer, parsed_request);
+  free(parsed_request);
+
   // Connect to the server
   if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
     close(sock);
     return NULL;
   }
-
-  // Parse the HTTP request and store it in buffer
-  parsed_request = parse_request(request);
-  strcpy(buffer, parsed_request);
-  free(parsed_request);
 
   // Send the HTTP request to the server
   if (send(sock, buffer, strlen(buffer), 0) < 0) {
