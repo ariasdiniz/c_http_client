@@ -41,8 +41,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   }
   buffer[read_size] = '\0';
 
-  // printf("%s\n", buffer);
-  // TODO: Parse response to HTTPResponse
+  response = parse_response(buffer);
 
   close(sock);
   return response;

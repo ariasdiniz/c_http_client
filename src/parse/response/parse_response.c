@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <regex.h>
+#include <stdio.h>
 
-#define __RESPONSE_BUFFER_SIZE 65536
 #define __FIRST_LINE_FLAG 0x0001
 #define __BODY_FLAG 0x0002
 
 static int get_response_code(char *line) {
+
   regex_t regex;
   int ret;
   regmatch_t pmatch[1];
@@ -16,29 +17,38 @@ static int get_response_code(char *line) {
   if (ret) {
       return -1;
   }
+
   ret = regexec(&regex, line, 1, pmatch, 0);
   if (!ret) {
-    return *(int *)&line[pmatch[0].rm_so];
+    char code_str[4] = {0};
+    strncpy(code_str, line + pmatch[1].rm_so, 3);
+    regfree(&regex);
+    return atoi(code_str);
   } else {
+    regfree(&regex);
     return 0;
   }
 }
 
 static KeyValue *get_header(char *line) {
-  char buffer[__RESPONSE_BUFFER_SIZE];
+  char buffer[strlen(line)];
   KeyValue *kv = malloc(sizeof(KeyValue));
   if (kv == NULL) {
     return NULL;
   }
   int count = 0;
-  for (int j = 0; line[j] != '\n'; j++) {
+
+  for (int j = 0; line[j] != '\r' && line[j + 1] != '\n'; j++) {
     if (line[j] == ':') {
-      kv->key = buffer;
+      kv->key = malloc(sizeof(char) * count);
+      memcpy(kv->key, buffer, count);
       count = 0;
     }
     buffer[count] = line[j];
     count += 1;
   }
+  kv->value = malloc(sizeof(char) * count);
+  memcpy(kv->value, buffer, count);
   return kv;
 }
 
@@ -47,36 +57,40 @@ HTTPResponse *parse_response(char *response) {
   if (response == NULL) {
     return NULL;
   }
+
+  size_t buffer_size = strlen(response);
   http_response->headers = malloc(sizeof(LinkedList));
-  char buffer[__RESPONSE_BUFFER_SIZE];
+  char buffer[buffer_size];
   unsigned int counter = 0;
   int flag = 0;
-  memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
-  for (int i = 0; i < __RESPONSE_BUFFER_SIZE && response[i] != '\0'; i++) {
+  memset(buffer, '\0', buffer_size);
+
+  for (int i = 0; i < buffer_size; i++) {
+    buffer[counter] = response[i];
+    counter++;
     switch (flag) {
+
     case 0:
-      buffer[counter] = response[i];
-      counter += 1;
-      if (response[i] == '\n') {
+      if (response[i] == '\r') {
         http_response->status = get_response_code(buffer);
         flag |= __FIRST_LINE_FLAG;
         counter = 0;
-        memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
+        i++;
+        memset(buffer, '\0', buffer_size);
       }
+
     case 1:
-      buffer[counter] = response[i];
-      counter += 1;
-      if (response[i] == '\n') {
+      if (response[i] == '\r') {
+        i++;
         addtolist(http_response->headers, get_header(buffer));
         counter = 0;
-        memset(buffer, '\0', __RESPONSE_BUFFER_SIZE);
+        memset(buffer, '\0', buffer_size);
       }
-      if (response[i] == '\n' && response[i + 1] == '\n') {
+      if (response[i] == '\r' && response[i + 1] == '\n' && response[i + 2] == '\r' && response[i + 3] == '\n') {
+        counter = 0;
         flag |= __BODY_FLAG;
+        i += 3;
       }
-    default:
-      buffer[counter] = response[i];
-      counter += 1;
     }
   }
   http_response->body = buffer;
