@@ -11,8 +11,10 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   int sock;
   struct sockaddr_in server_addr;
   char buffer[__BUFFER_SIZE];
+  char *parsed_request;
   int read_size;
   HTTPResponse *response = NULL;
+  memset(buffer, '\0', __BUFFER_SIZE);
 
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock < 0) {
@@ -28,7 +30,9 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     return NULL;
   }
 
-  strcpy(buffer, parse_request(request));
+  parsed_request = parse_request(request);
+  strcpy(buffer, parsed_request);
+  free(parsed_request);
   if (send(sock, buffer, strlen(buffer), 0) < 0) {
     close(sock);
     return NULL;
@@ -39,7 +43,6 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     close(sock);
     return NULL;
   }
-  buffer[read_size] = '\0';
 
   response = parse_response(buffer);
 

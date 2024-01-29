@@ -10,5 +10,6 @@ typedef struct HTTPResponse {
 } HTTPResponse;
 
 HTTPResponse *parse_response(char *response);
+int destroy_response(HTTPResponse *response);
 
 #endif // _ARIA_HTTP_CLIENT_SRC_PARSE_RESPONSE_H

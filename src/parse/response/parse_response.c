@@ -8,22 +8,22 @@
 #define __BODY_FLAG 0x0002
 
 static int get_response_code(char *line) {
-
   regex_t regex;
   int ret;
   regmatch_t pmatch[1];
-  return 0;
-  ret = regcomp(&regex, "[0-9]{3}", REG_EXTENDED);
+  
+  ret = regcomp(&regex, "([0-9]{3})", REG_EXTENDED);
   if (ret) {
-      return -1;
+    return -1;
   }
 
   ret = regexec(&regex, line, 1, pmatch, 0);
   if (!ret) {
     char code_str[4] = {0};
-    strncpy(code_str, line + pmatch[1].rm_so, 3);
+    strncpy(code_str, line + pmatch[0].rm_so, 4);
     regfree(&regex);
-    return atoi(code_str);
+    code_str[3] = '\0';
+    return strtol(code_str, '\0', 10);
   } else {
     regfree(&regex);
     return 0;
@@ -31,24 +31,29 @@ static int get_response_code(char *line) {
 }
 
 static KeyValue *get_header(char *line) {
-  char buffer[strlen(line)];
+  int line_len = strlen(line);
+  char buffer[line_len];
   KeyValue *kv = malloc(sizeof(KeyValue));
   if (kv == NULL) {
     return NULL;
   }
+  kv->key = malloc(sizeof(char) * line_len);
+  kv->value = malloc(sizeof(char) * line_len);
+  memset(buffer, '\0', line_len);
+  memset(kv->key, '\0', line_len);
+  memset(kv->value, '\0', line_len);
   int count = 0;
 
   for (int j = 0; line[j] != '\r' && line[j + 1] != '\n'; j++) {
     if (line[j] == ':') {
-      kv->key = malloc(sizeof(char) * count);
-      memcpy(kv->key, buffer, count);
+      memcpy(kv->key, buffer, line_len - 1);
       count = 0;
+      memset(buffer, '\0', line_len);
     }
     buffer[count] = line[j];
     count += 1;
   }
-  kv->value = malloc(sizeof(char) * count);
-  memcpy(kv->value, buffer, count);
+  memcpy(kv->value, buffer, line_len - 1);
   return kv;
 }
 
@@ -58,12 +63,13 @@ HTTPResponse *parse_response(char *response) {
     return NULL;
   }
 
-  size_t buffer_size = strlen(response);
-  http_response->headers = malloc(sizeof(LinkedList));
+  int buffer_size = strlen(response);
+  http_response->headers = createlist();
   char buffer[buffer_size];
   unsigned int counter = 0;
   int flag = 0;
   memset(buffer, '\0', buffer_size);
+  http_response->body = '\0';
 
   for (int i = 0; i < buffer_size; i++) {
     buffer[counter] = response[i];
@@ -77,7 +83,9 @@ HTTPResponse *parse_response(char *response) {
         counter = 0;
         i++;
         memset(buffer, '\0', buffer_size);
+        continue;
       }
+      break;
 
     case 1:
       if (response[i] == '\r') {
@@ -95,4 +103,20 @@ HTTPResponse *parse_response(char *response) {
   }
   http_response->body = buffer;
   return http_response;
+}
+
+int destroy_response(HTTPResponse *response) {
+  if (response == NULL) {
+    return -1;
+  }
+  KeyValue *item;
+  for (int i = 0; i < response->headers->size; i++) {
+    item = (KeyValue *)getfromindex(response->headers, i);
+    free(item->key);
+    free(item->value);
+    free(item);
+  }
+  deletelist(response->headers);
+  free(response);
+  return 0;
 }
