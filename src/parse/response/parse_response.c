@@ -38,7 +38,13 @@ static KeyValue *get_header(char *line) {
     return NULL;
   }
   kv->key = malloc(sizeof(char) * line_len);
+  if (kv->key == NULL) {
+    return NULL;
+  }
   kv->value = malloc(sizeof(char) * line_len);
+  if (kv->value == NULL) {
+    return NULL;
+  }
   memset(buffer, '\0', line_len);
   memset(kv->key, '\0', line_len);
   memset(kv->value, '\0', line_len);
@@ -46,14 +52,16 @@ static KeyValue *get_header(char *line) {
 
   for (int j = 0; line[j] != '\r' && line[j + 1] != '\n'; j++) {
     if (line[j] == ':') {
-      memcpy(kv->key, buffer, line_len - 1);
+      memcpy(kv->key, buffer, count);
       count = 0;
-      memset(buffer, '\0', line_len);
+      memset(buffer, '\0', count);
+      j++;
+      continue;
     }
     buffer[count] = line[j];
     count += 1;
   }
-  memcpy(kv->value, buffer, line_len - 1);
+  memcpy(kv->value, buffer, count);
   return kv;
 }
 
@@ -69,7 +77,6 @@ HTTPResponse *parse_response(char *response) {
   unsigned int counter = 0;
   int flag = 0;
   memset(buffer, '\0', buffer_size);
-  http_response->body = '\0';
 
   for (int i = 0; i < buffer_size; i++) {
     buffer[counter] = response[i];
