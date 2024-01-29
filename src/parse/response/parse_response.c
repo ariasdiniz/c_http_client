@@ -36,7 +36,7 @@ static int get_response_code(char *line) {
     return strtol(code_str, '\0', 10);
   } else {
     regfree(&regex);
-    return 0;
+    return -1;
   }
 }
 
@@ -117,6 +117,9 @@ int destroy_response(HTTPResponse *response) {
  * @return An HTTPResponse structure containing parsed information, or NULL on error.
  */
 HTTPResponse *parse_response(char *response) {
+  if (response == NULL) {
+    return NULL;
+  }
   HTTPResponse *http_response = malloc(sizeof(HTTPResponse));
   if (http_response == NULL || response == NULL) {
     return NULL;
@@ -177,6 +180,10 @@ HTTPResponse *parse_response(char *response) {
         i += 3;
       }
     }
+  }
+  if (flag < 1) {
+    destroy_response(http_response);
+    return NULL;
   }
   // Copy the remaining content as the response body
   strncpy(http_response->body, buffer, buffer_size);
