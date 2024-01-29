@@ -72,6 +72,11 @@ HTTPResponse *parse_response(char *response) {
   }
 
   int buffer_size = strlen(response);
+  http_response->body = malloc(sizeof(char) * buffer_size);
+  if (http_response->body == NULL) {
+    return NULL;
+  }
+
   http_response->headers = createlist();
   char buffer[buffer_size];
   unsigned int counter = 0;
@@ -108,7 +113,7 @@ HTTPResponse *parse_response(char *response) {
       }
     }
   }
-  http_response->body = buffer;
+  strncpy(http_response->body, buffer, buffer_size);
   return http_response;
 }
 
@@ -124,6 +129,7 @@ int destroy_response(HTTPResponse *response) {
     free(item);
   }
   deletelist(response->headers);
+  free(response->body);
   free(response);
   return 0;
 }
