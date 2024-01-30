@@ -19,7 +19,7 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
 
   // Handle the case where the hash table is NULL
   if (hash == NULL) {
-    strcat(headers, "\n");
+    strcat(headers, "\r\n");
     return headers;
   }
 
@@ -38,7 +38,7 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
       snprintf(
         buffer, 
         (sizeof(char) * _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE), 
-        "%s: %s\n",
+        "%s: %s\r\n",
         kv->key, 
         kv->value
       );
@@ -47,7 +47,7 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
   }
 
   // Append an empty line to indicate the end of headers
-  strcat(headers, "\n");
+  strcat(headers, "\r\n");
   return headers;
 }
 
@@ -69,7 +69,7 @@ static char *mount_http(HTTPRequest *request) {
   char buffer[_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE];
 
   // Construct the request line with method, path, and HTTP version
-  snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\n", request->method, request->path);
+  snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\r\n", request->method, request->path);
   strcat(request_text, buffer);
 
   // Add headers to the request text
@@ -77,7 +77,7 @@ static char *mount_http(HTTPRequest *request) {
 
   // Append the request body
   strcat(request_text, request->body);
-  strcat(request_text, "\n");
+  strcat(request_text, "\r\n");
 
   return request_text;
 }
