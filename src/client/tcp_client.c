@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #define __BUFFER_SIZE 65536
 
@@ -17,7 +18,7 @@
  */
 HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   int sock;
-  struct sockaddr_in server_addr;
+  struct addrinfo hints, *result, *rp;
   char buffer[__BUFFER_SIZE];
   char *parsed_request;
   int read_size;
@@ -26,25 +27,46 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
   // Initialize buffer with null characters
   memset(buffer, '\0', __BUFFER_SIZE);
 
-  // Create a TCP socket
-  sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock < 0) {
+  // Set up hints structure for getaddrinfo
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_INET; // Use IPv4
+  hints.ai_socktype = SOCK_STREAM;
+
+  // Resolve the server's IP address or hostname
+  if (getaddrinfo(host, NULL, &hints, &result) != 0) {
     return NULL;
   }
 
-  // Set up server address structure
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(port);
-  server_addr.sin_addr.s_addr = inet_addr(host);
+  // Iterate over the available addresses and connect to the first successful one
+  for (rp = result; rp != NULL; rp = rp->ai_next) {
+    // Create a TCP socket
+    sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+    if (sock == -1) {
+      continue;
+    }
 
-  // Parse the HTTP request and store it in buffer
-  parsed_request = parse_request(request);
-  strcpy(buffer, parsed_request);
-  free(parsed_request);
+    // Set up server address structure
+    struct sockaddr_in *server_addr = (struct sockaddr_in *)rp->ai_addr;
+    server_addr->sin_port = htons(port);
 
-  // Connect to the server
-  if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+    // Parse the HTTP request and store it in buffer
+    parsed_request = parse_request(request);
+    strcpy(buffer, parsed_request);
+    free(parsed_request);
+
+    // Connect to the server
+    if (connect(sock, rp->ai_addr, rp->ai_addrlen) != -1) {
+      break; // Success
+    }
+
     close(sock);
+  }
+
+  // Free the address information structure
+  freeaddrinfo(result);
+
+  // Check if a successful connection was established
+  if (rp == NULL) {
     return NULL;
   }
 
