@@ -1,7 +1,7 @@
 #ifndef _ARIA_HTTP_CLIENT_SRC_PARSE_RESPONSE_H
 #define _ARIA_HTTP_CLIENT_SRC_PARSE_RESPONSE_H
 
-#include "../../../lib/aria_data_structures/datastructures.h"
+#include "../../../lib/aria_data_structures/include/datastructures.h"
 
 typedef struct HTTPResponse {
   char *body;
