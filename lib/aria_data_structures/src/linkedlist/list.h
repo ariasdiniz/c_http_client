@@ -12,7 +12,7 @@ typedef struct LinkedList {
   int size;
 } LinkedList;
 
-struct LinkedList *createlist();
+struct LinkedList *createlist(void);
 void *deletelist(struct LinkedList *list);
 void *addtolist(struct LinkedList *list, void *value);
 void *getfromindex(struct LinkedList *list, int index);

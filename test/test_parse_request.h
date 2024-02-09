@@ -1,5 +1,5 @@
 #include "../include/httpclient.h"
-#include "../lib/aria_data_structures/datastructures.h"
+#include "../lib/aria_data_structures/include/datastructures.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

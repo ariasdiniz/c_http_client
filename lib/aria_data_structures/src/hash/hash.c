@@ -11,7 +11,7 @@
   @return Return a pointer to the newly created HashTable.
   return (void *)-1 if memory allocation failed.
 */
-HashTable *createhash() {
+HashTable *createhash(void) {
   HashTable *hash = malloc(sizeof(HashTable));
   if (hash == NULL) {
     return (void *)-1;

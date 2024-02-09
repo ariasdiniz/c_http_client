@@ -13,7 +13,7 @@ typedef struct KeyValue {
   char *value;
 } KeyValue;
 
-HashTable *createhash();
+HashTable *createhash(void);
 void *deletehash(HashTable *hash);
 char *getfromhash(HashTable *hash, char *key);
 void *addtohash(HashTable *hash, char *key, char *value);
