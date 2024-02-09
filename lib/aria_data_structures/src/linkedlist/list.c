@@ -9,7 +9,7 @@
   Return NULL on failure to allocate memory.
   Don't forget to free memory after usage with deletelist(list).
 */
-struct LinkedList *createlist() {
+struct LinkedList *createlist(void) {
   struct LinkedList *list = malloc(sizeof(struct LinkedList));
   if (list == NULL) {
     return NULL;
