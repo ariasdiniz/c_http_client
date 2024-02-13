@@ -29,7 +29,7 @@ static int get_response_code(char *line) {
   if (!ret) {
     char code_str[4] = {0};
     // Extract the matched response code substring
-    strncpy(code_str, line + pmatch[0].rm_so, 4);
+    strncpy(code_str, line + pmatch[0].rm_so, 3);
     regfree(&regex);
     code_str[3] = '\0';
     // Convert the response code string to an integer
@@ -186,6 +186,6 @@ HTTPResponse *parse_response(char *response) {
     return NULL;
   }
   // Copy the remaining content as the response body
-  strncpy(http_response->body, buffer, buffer_size);
+  strncpy(http_response->body, buffer, buffer_size-1);
   return http_response;
 }
