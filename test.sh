@@ -37,7 +37,7 @@ done
 # your main program, use other compiler flags etc.
 
 # Compile the test
-gcc -o tests $all_files -O0 -g -Wall -Wextra -Werror -Wno-unused-parameter \
+gcc -o tests $all_files -O3 -g -Wall -Wextra -Werror -Wno-unused-parameter \
  -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function \
  -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-unused-result \
  -Wno-unused-label -Wno-unused-val
