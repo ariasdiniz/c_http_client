@@ -44,7 +44,7 @@ Aria's C HTTP Client is a simple HTTP client library for the C programming langu
 
     Example:
     ```c
-    HTTPResponse *response = shttp(request, "127.0.0.1", 8080);
+    HTTPResponse *response = shttp(request, "127.0.0.1", 8080, 0);
     ```
 
 4. **Full Usage:**
@@ -61,7 +61,7 @@ request->headers = headers;
 addtohash(headers, "key1", "val1");
 
 // Call the target server
-response = shttp(request, "127.0.0.1", 8080);
+response = shttp(request, "127.0.0.1", 8080, 0);
 
 // Use the response
 printf("%s\n", response->body);
