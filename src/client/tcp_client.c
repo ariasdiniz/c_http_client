@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #define __BUFFER_SIZE 65536
 
@@ -14,9 +16,10 @@
  * @param request The HTTPRequest structure containing the request information.
  * @param host The server's IP address or hostname.
  * @param port The port number on which the server is listening.
+ * @param use_ssl Boolean indicating whether SSL/TLS should be used.
  * @return An HTTPResponse structure containing the parsed response, or NULL on error.
  */
-HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
+HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl) {
   int sock;
   struct addrinfo hints, *result, *rp;
   char buffer[__BUFFER_SIZE];
@@ -49,11 +52,6 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     struct sockaddr_in *server_addr = (struct sockaddr_in *)rp->ai_addr;
     server_addr->sin_port = htons(port);
 
-    // Parse the HTTP request and store it in buffer
-    parsed_request = parse_request(request);
-    strcpy(buffer, parsed_request);
-    free(parsed_request);
-
     // Connect to the server
     if (connect(sock, rp->ai_addr, rp->ai_addrlen) != -1) {
       break; // Success
@@ -70,21 +68,90 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port) {
     return NULL;
   }
 
-  // Send the HTTP request to the server
-  if (send(sock, buffer, strlen(buffer), 0) < 0) {
-    close(sock);
-    return NULL;
-  }
+  if (use_ssl) {
+    // Initialize SSL
+    SSL_library_init();
+    SSL_CTX *ctx = SSL_CTX_new(SSLv23_client_method());
+    if (!ctx) {
+      close(sock);
+      return NULL;
+    }
 
-  // Receive the HTTP response from the server
-  read_size = recv(sock, buffer, __BUFFER_SIZE - 1, 0);
-  if (read_size < 0) {
-    close(sock);
-    return NULL;
-  }
+    // Create SSL connection
+    SSL *ssl = SSL_new(ctx);
+    if (!ssl) {
+      close(sock);
+      SSL_CTX_free(ctx);
+      return NULL;
+    }
 
-  // Parse the HTTP response and store it in the response structure
-  response = parse_response(buffer);
+    // Set up the SSL connection
+    if (SSL_set_fd(ssl, sock) == 0) {
+      close(sock);
+      SSL_free(ssl);
+      SSL_CTX_free(ctx);
+      return NULL;
+    }
+
+    // Perform SSL handshake
+    if (SSL_connect(ssl) != 1) {
+      close(sock);
+      SSL_free(ssl);
+      SSL_CTX_free(ctx);
+      return NULL;
+    }
+
+    // Parse the HTTP request and store it in buffer
+    parsed_request = parse_request(request);
+    strcpy(buffer, parsed_request);
+    free(parsed_request);
+
+    // Send the HTTP request over SSL
+    if (SSL_write(ssl, buffer, strlen(buffer)) < 0) {
+      close(sock);
+      SSL_free(ssl);
+      SSL_CTX_free(ctx);
+      return NULL;
+    }
+
+    // Receive the HTTP response over SSL
+    read_size = SSL_read(ssl, buffer, __BUFFER_SIZE - 1);
+    if (read_size < 0) {
+      close(sock);
+      SSL_free(ssl);
+      SSL_CTX_free(ctx);
+      return NULL;
+    }
+
+    // Parse the HTTP response and store it in the response structure
+    response = parse_response(buffer);
+
+    // Close SSL connection
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+  } else {
+    // Parse the HTTP request and store it in buffer
+    parsed_request = parse_request(request);
+    strcpy(buffer, parsed_request);
+    free(parsed_request);
+
+    // Send the HTTP request to the server
+    if (send(sock, buffer, strlen(buffer), 0) < 0) {
+      close(sock);
+      return NULL;
+    }
+
+    // Receive the HTTP response from the server
+    read_size = recv(sock, buffer, __BUFFER_SIZE - 1, 0);
+    if (read_size < 0) {
+      close(sock);
+      return NULL;
+    }
+
+    // Parse the HTTP response and store it in the response structure
+    response = parse_response(buffer);
+  }
 
   // Close the socket
   close(sock);

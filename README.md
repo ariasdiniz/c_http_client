@@ -80,7 +80,7 @@ The library can be integrated into your C project by including the necessary hea
 
 **Next Steps and Improvements:**
 
-- [ ] **Support for TLS/SSL Security:** Enhance the library to support secure communication using TLS/SSL.
+- [x] **Support for TLS/SSL Security:** Enhance the library to support secure communication using TLS/SSL.
 - [ ] **Support for Encoded Responses:** Implement support for decoding various content encodings in HTTP responses.
 - [ ] **Support for Cache:** Integrate caching mechanisms to improve performance and reduce redundant requests.
 
