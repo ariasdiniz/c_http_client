@@ -40,7 +40,7 @@ done
 gcc -o tests $all_files -O3 -g -Wall -Wextra -Werror -Wno-unused-parameter \
  -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function \
  -Wno-unused-but-set-variable -Wno-unused-but-set-parameter -Wno-unused-result \
- -Wno-unused-label -Wno-unused-val
+ -Wno-unused-label -Wno-unused-val -lcrypto -lssl
 
 # Run the program
 chmod u+x tests
