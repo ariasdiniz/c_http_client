@@ -74,6 +74,39 @@ printf("val: %s\n", kv->value);
 destroy_response(response);
 ```
 
+5. **Full Usage With SSL**
+
+```c
+// Incluse SSL libraries
+#include <openssl/ssl.h>
+#include <openssl/evp.h>
+...
+// Create and mount the request
+HashTable *headers = createhash();
+HTTPRequest *request = malloc(sizeof(HTTPRequest));
+
+request->body = "test body";
+request->method = "GET";
+request->path = "/";
+request->headers = headers;
+addtohash(headers, "key1", "val1");
+
+// Call the target server
+response = shttp(request, "127.0.0.1", 8080, 1);
+
+// Use the response
+printf("%s\n", response->body);
+printf("%d\n", response->status);
+
+kv = (KeyValue *)getfromindex(response->headers, 0);
+
+printf("key: %s\n", kv->key);
+printf("val: %s\n", kv->value);
+destroy_response(response);
+```
+
+*Don't forget to link `-lcrypto` and `-lss` when compiling.*
+
 **Building:**
 
 The library can be integrated into your C project by including the necessary header files and source files.
