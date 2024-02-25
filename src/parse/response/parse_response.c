@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #define __FIRST_LINE_FLAG 0x0001
+#define __HEADER_VALUE_FLAG 0x0001
 #define __BODY_FLAG 0x0002
 
 /**
@@ -49,6 +50,7 @@ static int get_response_code(char *line) {
 static KeyValue *get_header(char *line) {
   int line_len = strlen(line);
   char buffer[line_len];
+  int value_flag = 0;
   KeyValue *kv = malloc(sizeof(KeyValue));
   if (kv == NULL) {
     return NULL;
@@ -67,8 +69,9 @@ static KeyValue *get_header(char *line) {
   int count = 0;
 
   for (int j = 0; line[j] != '\r' && line[j + 1] != '\n'; j++) {
-    if (line[j] == ':') {
+    if (line[j] == ':' && value_flag == 0) {
       // Copy the key from the buffer
+      value_flag |= __HEADER_VALUE_FLAG;
       memcpy(kv->key, buffer, count);
       count = 0;
       memset(buffer, '\0', count);
