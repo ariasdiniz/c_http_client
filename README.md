@@ -61,7 +61,7 @@ request->headers = headers;
 addtohash(headers, "key1", "val1");
 
 // Call the target server
-response = shttp(request, "127.0.0.1", 8080, 0);
+HTTPResponse *response = shttp(request, "127.0.0.1", 8080, 0);
 
 // Use the response
 printf("%s\n", response->body);
@@ -92,7 +92,7 @@ request->headers = headers;
 addtohash(headers, "key1", "val1");
 
 // Call the target server
-response = shttp(request, "127.0.0.1", 8080, 1);
+HTTPResponse *response = shttp(request, "127.0.0.1", 8080, 1);
 
 // Use the response
 printf("%s\n", response->body);
