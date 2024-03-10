@@ -1,4 +1,4 @@
-#include "tcp_client.h"
+#include "../../include/httpclient.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,17 +8,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define __BUFFER_SIZE 65536
-
-/**
- * @brief Sends an HTTP request to a specified server and port using a TCP socket.
- *
- * @param request The HTTPRequest structure containing the request information.
- * @param host The server's IP address or hostname.
- * @param port The port number on which the server is listening.
- * @param use_ssl Boolean indicating whether SSL/TLS should be used.
- * @return An HTTPResponse structure containing the parsed response, or NULL on error.
- */
 HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl) {
   int sock;
   struct addrinfo hints, *result, *rp;
