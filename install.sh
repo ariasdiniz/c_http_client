@@ -41,4 +41,6 @@ if [[ $? != 0 ]]; then
   exit 1
 fi
 
+rm -r libhttp_client.so
+
 echo "Installation of libhttp_client.so finished."
