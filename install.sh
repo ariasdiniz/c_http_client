@@ -1,6 +1,13 @@
 # This script compiles and install the http_client library. 
 # Use it only if your Operating System is Linux and you have the gcc compiler installed.
 
+check_error() {
+  if [[ $? != 0 ]]; then
+    echo $1
+    exit 1
+  fi
+}
+
 directory="."
 all_files=""
 
@@ -8,18 +15,12 @@ readarray -t files < <(find "$directory" -type f \( -name "*.c" \))
 
 for file in "${files[@]}"; do
   gcc -c -fpic $file -o $file.o -I.
-  if [[ $? != 0  ]]; then
-    echo "Error compiling position independent code."
-    exit 1
-  fi
+  check_error "Error compiling position independent code of file $file."
   all_files+="$file.o "
 done
 
 gcc -shared -o libhttp_client.so $all_files
-if [[ $? != 0 ]]; then
-  echo "Error compiling shared object."
-  exit 1
-fi
+check_error "Error compiling shared object."
 
 for file in "${files[@]}"; do
   rm -r $file.o
@@ -29,17 +30,11 @@ echo "Compilation of libhttp_client.so finished."
 
 sudo cp libhttp_client.so /usr/lib
 
-if [[ $? != 0 ]]; then
-  echo "Error copying shared object to /usr/lib."
-  exit 1
-fi
+check_error "Error copying shared object to /usr/lib."
 
 sudo cp include/httpclient.h /usr/include
 
-if [[ $? != 0 ]]; then
-  echo "Error copying header file to /usr/include."
-  exit 1
-fi
+check_error "Error copying header file to /usr/include."
 
 rm -r libhttp_client.so
 
