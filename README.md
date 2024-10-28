@@ -71,6 +71,7 @@ kv = (KeyValue *)getfromindex(response->headers, 0);
 
 printf("key: %s\n", kv->key);
 printf("val: %s\n", kv->value);
+free(request);
 destroy_response(response);
 ```
 
@@ -103,6 +104,7 @@ kv = (KeyValue *)getfromindex(response->headers, 0);
 printf("key: %s\n", kv->key);
 printf("val: %s\n", kv->value);
 destroy_response(response);
+free(request);
 ```
 
 *Don't forget to link `-lcrypto` and `-lss` when compiling.*

@@ -99,7 +99,6 @@ char *parse_request(HTTPRequest *request) {
 
   // Delete the HashTable containing headers and free the HTTPRequest structure
   deletehash(request->headers);
-  free(request);
 
   return response;
 }

@@ -8,13 +8,13 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl) {
+HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl, HTTPResponse *response_buffer) {
   int sock;
   struct addrinfo hints, *result, *rp;
   char buffer[__BUFFER_SIZE];
   char *parsed_request;
   int read_size;
-  HTTPResponse *response = NULL;
+  HTTPResponse *response = response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
 
   // Initialize buffer with null characters
   memset(buffer, '\0', __BUFFER_SIZE);
@@ -113,7 +113,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use
     }
 
     // Parse the HTTP response and store it in the response structure
-    response = parse_response(buffer);
+    response = parse_response(buffer, response);
 
     // Close SSL connection
     SSL_shutdown(ssl);
@@ -139,7 +139,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use
     }
 
     // Parse the HTTP response and store it in the response structure
-    response = parse_response(buffer);
+    response = parse_response(buffer, response);
   }
 
   // Close the socket

@@ -96,18 +96,22 @@ int destroy_response(HTTPResponse *response) {
   if (response == NULL) {
     return -1;
   }
-  KeyValue *item;
-  // Free memory for each header key-value pair
-  for (int i = 0; i < response->headers->size; i++) {
-    item = (KeyValue *)getfromindex(response->headers, i);
-    free(item->key);
-    free(item->value);
-    free(item);
+  if (response->headers != NULL) {
+    KeyValue *item;
+    // Free memory for each header key-value pair
+    for (int i = 0; i < response->headers->size; i++) {
+      item = (KeyValue *)getfromindex(response->headers, i);
+      free(item->key);
+      free(item->value);
+      free(item);
+    }
+    // Delete the list containing header key-value pairs
+    deletelist(response->headers);
   }
-  // Delete the list containing header key-value pairs
-  deletelist(response->headers);
-  // Free memory for the response body
-  free(response->body);
+  if (response->body != NULL) {
+    // Free memory for the response body
+    free(response->body);
+  }
   // Free memory for the entire HTTPResponse structure
   free(response);
   return 0;
@@ -119,28 +123,39 @@ int destroy_response(HTTPResponse *response) {
  * @param response The raw HTTP response string to be parsed.
  * @return An HTTPResponse structure containing parsed information, or NULL on error.
  */
-HTTPResponse *parse_response(char *response) {
+HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer) {
   if (response == NULL) {
     return NULL;
   }
-  HTTPResponse *http_response = malloc(sizeof(HTTPResponse));
+  HTTPResponse *http_response = response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
   if (http_response == NULL || response == NULL) {
     return NULL;
   }
 
   int buffer_size = strlen(response);
-  http_response->body = malloc(sizeof(char) * buffer_size);
+  http_response->body = http_response->body == NULL ? malloc(sizeof(char) * buffer_size) : response_buffer->body;
   if (http_response->body == NULL) {
     return NULL;
   }
 
   // Create a list to store header key-value pairs
-  http_response->headers = createlist();
+  if (http_response->headers == NULL) http_response->headers = createlist();
   char buffer[buffer_size];
   KeyValue *temp;
   unsigned int counter = 0;
   int flag = 0;
+  int body_size = strlen(http_response->body);
+  size_t headers_size = http_response->headers->size;
   memset(buffer, '\0', buffer_size);
+  memset(http_response->body, '\0', body_size);
+
+  for (size_t i = 0; i < headers_size; i++) {
+    temp = (KeyValue *)getfromindex(http_response->headers, headers_size - i - 1);
+    free(temp->key);
+    free(temp->value);
+    free(temp);
+    removefromindex(http_response->headers, headers_size - i - 1);
+  }
 
   for (int i = 0; i < buffer_size; i++) {
     buffer[counter] = response[i];
@@ -152,7 +167,6 @@ HTTPResponse *parse_response(char *response) {
         // Parse the first line to extract the response code
         http_response->status = get_response_code(buffer);
         if (http_response->status == -1) {
-          destroy_response(http_response);
           return NULL;
         }
         flag |= __FIRST_LINE_FLAG;
@@ -185,7 +199,6 @@ HTTPResponse *parse_response(char *response) {
     }
   }
   if (flag < 1) {
-    destroy_response(http_response);
     return NULL;
   }
   // Copy the remaining content as the response body
