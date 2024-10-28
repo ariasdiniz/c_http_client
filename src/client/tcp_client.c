@@ -113,7 +113,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use
     }
 
     // Parse the HTTP response and store it in the response structure
-    response = parse_response(buffer);
+    response = parse_response(buffer, NULL);
 
     // Close SSL connection
     SSL_shutdown(ssl);
@@ -139,7 +139,7 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use
     }
 
     // Parse the HTTP response and store it in the response structure
-    response = parse_response(buffer);
+    response = parse_response(buffer, NULL);
   }
 
   // Close the socket

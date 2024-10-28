@@ -127,7 +127,7 @@ typedef struct HTTPResponse {
  * @param response The raw HTTP response string to be parsed.
  * @return An HTTPResponse structure containing parsed information, or NULL on error.
  */
-HTTPResponse *parse_response(char *response);
+HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer);
 
 /**
  * @brief Frees the memory allocated for the HTTPResponse structure.

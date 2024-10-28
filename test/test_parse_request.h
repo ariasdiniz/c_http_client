@@ -14,6 +14,7 @@ void test_iterate_over_null_hash() {
   char *expected_result = "GET /test HTTP/1.1\r\n\r\nbody\r\n";
   assert(strcmp(result, expected_result) == 0);
   free(result);
+  free(request);
   printf("test_iterate_over_null_hash passed.\n");
 }
 
@@ -28,6 +29,7 @@ void test_iterate_over_hash_empty() {
   char *expected_result = "GET /test HTTP/1.1\r\n\r\nbody\r\n";
   assert(strcmp(result, expected_result) == 0);
   free(result);
+  free(request);
   printf("test_iterate_over_empty_hash passed.\n");
 }
 
@@ -45,6 +47,7 @@ void test_iterate_over_hash() {
   char *expected_result = "GET /test HTTP/1.1\r\nkey1: value1\r\nkey1: value\r\nkey2: value2\r\n\r\nbody\r\n";
   assert(strcmp(result, expected_result) == 0);
   free(result);
+  free(request);
   printf("test_iterate_over_hash passed.\n");
 }
 
