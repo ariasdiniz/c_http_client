@@ -152,8 +152,9 @@ char *parse_request(HTTPRequest *request);
  * @param host The server's IP address or hostname.
  * @param port The port number on which the server is listening.
  * @param use_ssl Boolean indicating whether SSL/TLS should be used.
+ * @param response_buffer An optional HTTPResponse struct to be used as buffer.
  * @return An HTTPResponse structure containing the parsed response, or NULL on error.
  */
-HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl);
+HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl, HTTPResponse *response_buffer);
 
 #endif // _ARIA_HTTP_CLIENT_H

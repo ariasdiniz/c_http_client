@@ -58,6 +58,10 @@ void test_parse_response() {
   char *invalid_code_response_str = "HTTP/1.1 InvalidCode OK\r\n\r\nHello, World!";
   assert(parse_response(invalid_code_response_str, buffer) == NULL);
 
+  // Test parsing a response without buffer
+  HTTPResponse *resp = parse_response(valid_response_str, NULL);
+
+  destroy_response(resp);
   destroy_response(buffer);
 
   printf("test_parse_response passed.\n");
