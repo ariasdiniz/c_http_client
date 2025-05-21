@@ -1,8 +1,8 @@
-# Aria's C HTTP Client
+#C HTTP Client
 
 **Overview:**
 
-Aria's C HTTP Client is a simple HTTP client library for the C programming language. The library allows users to easily send HTTP requests and handle responses. Please note that the project is still in development and may undergo further enhancements.
+C HTTP Client is a simple HTTP client library for the C programming language created for educational purposes. The library allows users to easily send HTTP requests and handle responses. Please note that the project is still in development and may not be fully functional or secure for production use.
 
 **Features:**
 
