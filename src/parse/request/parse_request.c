@@ -1,12 +1,13 @@
 #include "../../../include/httpclient.h"
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE 65536
 
 /**
- * @brief Iterates over a HashTable and appends formatted headers to a given string.
+ * @brief Iterates over a HashTable and appends formatted headers to a given
+ * string.
  *
  * @param hash The HashTable containing headers to be processed.
  * @param headers The string to which headers are appended.
@@ -35,13 +36,9 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
     for (int j = 0; j < hash->bucket[i]->size; j++) {
       kv = ((KeyValue *)getfromindex(list, j));
       // Format and append the header to the string
-      snprintf(
-        buffer, 
-        (sizeof(char) * _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE), 
-        "%s: %s\r\n",
-        kv->key, 
-        kv->value
-      );
+      snprintf(buffer,
+               (sizeof(char) * _ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE),
+               "%s: %s\r\n", kv->key, kv->value);
       strcat(headers, buffer);
     }
   }
@@ -52,10 +49,12 @@ static char *iterate_over_hash(HashTable *hash, char *headers, char *buffer) {
 }
 
 /**
- * @brief Mounts an HTTP request string using the provided HTTPRequest structure.
+ * @brief Mounts an HTTP request string using the provided HTTPRequest
+ * structure.
  *
  * @param request The HTTPRequest structure containing request information.
- * @return A dynamically allocated string representing the entire HTTP request, or NULL on error.
+ * @return A dynamically allocated string representing the entire HTTP request,
+ * or NULL on error.
  */
 static char *mount_http(HTTPRequest *request) {
   char *request_text = malloc(_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE);
@@ -69,7 +68,8 @@ static char *mount_http(HTTPRequest *request) {
   char buffer[_ARIA_C_HTTP_CLIENT_HTTPCLIENT_MAX_REQUEST_SIZE];
 
   // Construct the request line with method, path, and HTTP version
-  snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\r\n", request->method, request->path);
+  snprintf(buffer, sizeof(buffer), "%s %s HTTP/1.1\r\n", request->method,
+           request->path);
   strcat(request_text, buffer);
 
   // Add headers to the request text
@@ -86,7 +86,8 @@ static char *mount_http(HTTPRequest *request) {
  * @brief Parses an HTTPRequest structure and returns an HTTP request string.
  *
  * @param request The HTTPRequest structure to be parsed.
- * @return A dynamically allocated string representing the entire HTTP request, or NULL on error.
+ * @return A dynamically allocated string representing the entire HTTP request,
+ * or NULL on error.
  */
 char *parse_request(HTTPRequest *request) {
   // Check if the input request is NULL

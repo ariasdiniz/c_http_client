@@ -1,8 +1,8 @@
 #include "../../../include/httpclient.h"
-#include <stdlib.h>
-#include <string.h>
 #include <regex.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define __FIRST_LINE_FLAG 0x0001
 #define __HEADER_VALUE_FLAG 0x0001
@@ -121,25 +121,30 @@ int destroy_response(HTTPResponse *response) {
  * @brief Parses the entire HTTP response and returns an HTTPResponse structure.
  *
  * @param response The raw HTTP response string to be parsed.
- * @return An HTTPResponse structure containing parsed information, or NULL on error.
+ * @return An HTTPResponse structure containing parsed information, or NULL on
+ * error.
  */
 HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer) {
   if (response == NULL) {
     return NULL;
   }
-  HTTPResponse *http_response = response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
+  HTTPResponse *http_response =
+      response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
   if (http_response == NULL || response == NULL) {
     return NULL;
   }
 
   int buffer_size = strlen(response);
-  http_response->body = http_response->body == NULL ? malloc(sizeof(char) * buffer_size) : response_buffer->body;
+  http_response->body = http_response->body == NULL
+                            ? malloc(sizeof(char) * buffer_size)
+                            : response_buffer->body;
   if (http_response->body == NULL) {
     return NULL;
   }
 
   // Create a list to store header key-value pairs
-  if (http_response->headers == NULL) http_response->headers = createlist();
+  if (http_response->headers == NULL)
+    http_response->headers = createlist();
   char buffer[buffer_size];
   KeyValue *temp;
   unsigned int counter = 0;
@@ -150,7 +155,8 @@ HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer) {
   memset(http_response->body, '\0', body_size);
 
   for (size_t i = 0; i < headers_size; i++) {
-    temp = (KeyValue *)getfromindex(http_response->headers, headers_size - i - 1);
+    temp =
+        (KeyValue *)getfromindex(http_response->headers, headers_size - i - 1);
     free(temp->key);
     free(temp->value);
     free(temp);
@@ -190,7 +196,8 @@ HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer) {
         counter = 0;
         memset(buffer, '\0', buffer_size);
       }
-      if (response[i] == '\r' && response[i + 1] == '\n' && response[i + 2] == '\r' && response[i + 3] == '\n') {
+      if (response[i] == '\r' && response[i + 1] == '\n' &&
+          response[i + 2] == '\r' && response[i + 3] == '\n') {
         // Detect the end of headers and start of the body
         counter = 0;
         flag |= __BODY_FLAG;
@@ -202,6 +209,6 @@ HTTPResponse *parse_response(char *response, HTTPResponse *response_buffer) {
     return NULL;
   }
   // Copy the remaining content as the response body
-  strncpy(http_response->body, buffer, buffer_size-1);
+  strncpy(http_response->body, buffer, buffer_size - 1);
   return http_response;
 }

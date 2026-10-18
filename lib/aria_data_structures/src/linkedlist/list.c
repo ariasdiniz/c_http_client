@@ -1,6 +1,6 @@
 #include "../../../../include/httpclient.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
   Create a new LinkedList.
@@ -86,14 +86,15 @@ void *addtolist(struct LinkedList *list, void *value) {
 
   @param list A pointer to a LinkedList.
   @param index An integer representing the index.
-  @returns Returns a pointer to the value of the index. return (void *)-1 in case of error.
+  @returns Returns a pointer to the value of the index. return (void *)-1 in
+  case of error.
 */
 void *getfromindex(struct LinkedList *list, int index) {
   if (list == NULL || index > list->size - 1 || index < 0) {
     return (void *)-1;
   }
   struct Node *node = list->head;
-  for (int i=0; i < index; i++) {
+  for (int i = 0; i < index; i++) {
     node = node->next;
   }
   return node->value;
@@ -126,7 +127,7 @@ void *removefromindex(struct LinkedList *list, int index) {
     resetlist(list);
     return 0;
   }
-  for (int i=0; i < index; i++) {
+  for (int i = 0; i < index; i++) {
     temp = node;
     node = node->next;
   }

@@ -1,20 +1,22 @@
 #include "../../include/httpclient.h"
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 
-HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use_ssl, HTTPResponse *response_buffer) {
+HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port,
+                    int use_ssl, HTTPResponse *response_buffer) {
   int sock;
   struct addrinfo hints, *result, *rp;
   char buffer[__BUFFER_SIZE];
   char *parsed_request;
   int read_size;
-  HTTPResponse *response = response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
+  HTTPResponse *response =
+      response_buffer == NULL ? malloc(sizeof(HTTPResponse)) : response_buffer;
 
   // Initialize buffer with null characters
   memset(buffer, '\0', __BUFFER_SIZE);
@@ -29,7 +31,8 @@ HTTPResponse *shttp(HTTPRequest *request, char *host, unsigned int port, int use
     return NULL;
   }
 
-  // Iterate over the available addresses and connect to the first successful one
+  // Iterate over the available addresses and connect to the first successful
+  // one
   for (rp = result; rp != NULL; rp = rp->ai_next) {
     // Create a TCP socket
     sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
